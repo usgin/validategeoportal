@@ -2,9 +2,14 @@ from connection import make_query as run_queries
 from rules import rules, writeout
 
 def validate_records(records):
+    #print "----- Beginning Query Validation -----"
+    #count = 0
     for record in records:
         for rule in rules:
             rule.validate(record)
+        
+        #count = count + 1
+        #print "\t" + str(count) + "/" + str(len(records))
 
 def run_validation():
     try:

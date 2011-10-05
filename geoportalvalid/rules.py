@@ -37,8 +37,12 @@ class Rule():
                 value = node.text
             else:
                 value = node
-                
-            response = self.criteria(value)
+            
+            if not type(value) == str:                    
+                log(False, record.docuuid, self.xpath, "No valid value", "XPath evaluation did not return a valid string.")
+                continue 
+            
+            response = self.criteria(value)    
             if not type(response) == bool:
                 result = response[0]
                 extraMessage = " " + response[1]
