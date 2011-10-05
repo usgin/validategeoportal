@@ -1,5 +1,7 @@
 import psycopg2
-from config import dbString as connection_string
+from config import dbString as connection_string, progressFilePath
+
+f = open(progressFilePath, "wb")
 
 getAllRecordsSQL =  "SELECT gpt_resource_data.id, gpt_resource_data.docuuid, gpt_resource_data.xml "
 getAllRecordsSQL += "FROM gpt_resource_data INNER JOIN gpt_resource ON gpt_resource_data.docuuid = gpt_resource.docuuid "
@@ -13,7 +15,7 @@ db = psycopg2.connect(connection_string)
 countSQL = "SELECT COUNT(*) FROM (" + getAllRecordsSQL + ") AS foo"
 cur = db.cursor()
 cur.execute(countSQL)
-total_records = cur.fetchone()[0]
+total_records = 20 #cur.fetchone()[0]
 cur.close()
 
 records_per_query = 10
@@ -46,7 +48,7 @@ def make_query(callback, start_record=0):
     # Execute the callback function    
     callback(records)
     
-    print str(start_record + records_per_query) + " of " + str(total_records) + " complete."
+    f.write(str(start_record + records_per_query) + " of " + str(total_records) + " complete.\n")
     
     # Completed callback for these records, move on
     make_query(callback, start_record + records_per_query)
