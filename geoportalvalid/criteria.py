@@ -32,7 +32,7 @@ def url_resolves(value):
         except urllib2.HTTPError, err:
             return False, "URL returned HTTP error code: " + str(err.code)
         except urllib2.URLError, err:
-            return False, "URL raised an error: " + str(err.reason.message)
+            return False, "URL raised an error: " + str(err)
         
         if y.code in [ 200 ]:
             return True
