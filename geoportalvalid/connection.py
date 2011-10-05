@@ -1,8 +1,6 @@
 import psycopg2
 from config import dbString as connection_string, progressFilePath
 
-f = open(progressFilePath, "wb")
-
 getAllRecordsSQL =  "SELECT gpt_resource_data.id, gpt_resource_data.docuuid, gpt_resource_data.xml "
 getAllRecordsSQL += "FROM gpt_resource_data INNER JOIN gpt_resource ON gpt_resource_data.docuuid = gpt_resource.docuuid "
 getAllRecordsSQL += "WHERE gpt_resource.approvalstatus = 'approved' AND gpt_resource.findable = 'true' "
@@ -48,7 +46,9 @@ def make_query(callback, start_record=0):
     # Execute the callback function    
     callback(records)
     
+    f = open(progressFilePath, "a")
     f.write(str(start_record + records_per_query) + " of " + str(total_records) + " complete.\n")
+    f.close()
     
     # Completed callback for these records, move on
     make_query(callback, start_record + records_per_query)
