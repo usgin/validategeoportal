@@ -14,7 +14,7 @@ class LogEntry():
 def log(valid, recordId, xpath, value, message=""):
     if not valid:
         log_entry = LogEntry(xpath, value, message)
-        logWriter.writerow([ id, log_entry.xpath, log_entry.value, log_entry.message ])
+        logWriter.writerow([ recordId, log_entry.xpath, log_entry.value, log_entry.message ])
         
         if recordId in failed_results:
             failed_results[recordId].append( log_entry )
