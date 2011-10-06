@@ -1,4 +1,4 @@
-import psycopg2
+import psycopg2, math
 from config import dbString as connection_string, progressFilePath, startRecNo
 
 getAllRecordsSQL =  "SELECT gpt_resource_data.id, gpt_resource_data.docuuid, gpt_resource_data.xml "
@@ -13,7 +13,7 @@ db = psycopg2.connect(connection_string)
 countSQL = "SELECT COUNT(*) FROM (" + getAllRecordsSQL + ") AS foo"
 cur = db.cursor()
 cur.execute(countSQL)
-total_records = cur.fetchone()[0]
+total_records = 35 #cur.fetchone()[0]
 cur.close()
 
 records_per_query = 10
@@ -26,32 +26,30 @@ class record:
         self.xml = xml    
         
 def make_query(callback, start_record=startRecNo):
-    if start_record >= total_records:
-        # All queries have been made
-        return
+    total_queries = int(math.ceil(float(total_records - start_record) / records_per_query))
     
-    # Build the query string
-    next_setSQL = getAllRecordsSQL + " LIMIT " + str(records_per_query) + " OFFSET " + str(start_record)
-    
-    # Make the query
-    cur = db.cursor()
-    cur.execute(next_setSQL)
-    response = cur.fetchall()
-    
-    # Build a list of records
-    records = list()
-    for row in response:
-        records.append(record(row[0], row[1], row[2]))
-    
-    # Execute the callback function    
-    callback(records)
-    
-    f = open(progressFilePath, "a")
-    f.write(str(start_record + records_per_query) + " of " + str(total_records) + " complete.\n")
-    f.close()
-    
-    # Completed callback for these records, move on
-    make_query(callback, start_record + records_per_query)
+    for i in range(total_queries):
+        offset = (i * records_per_query) + start_record
+        limit = records_per_query if offset + records_per_query < total_records else total_records - offset
+        #print "Offset: " + str(offset) + " ||| Limit: " + str(limit) + " ||| Total: " + str(total_records)
+        next_setSQL = getAllRecordsSQL + " LIMIT " + str(limit) + " OFFSET " + str(offset) 
+        
+        # Make the query
+        cur = db.cursor()
+        cur.execute(next_setSQL)
+        response = cur.fetchall()
+        
+        # Build a list of records
+        records = list()
+        for row in response:
+            records.append(record(row[0], row[1], row[2]))
+        
+        # Execute the callback function    
+        callback(records)
+        
+        f = open(progressFilePath, "a")
+        f.write(str(start_record + records_per_query) + " of " + str(total_records) + " complete.\n")
+        f.close()
     
     
 
