@@ -1,5 +1,5 @@
 import psycopg2
-from config import dbString as connection_string, progressFilePath
+from config import dbString as connection_string, progressFilePath, startRecNo
 
 getAllRecordsSQL =  "SELECT gpt_resource_data.id, gpt_resource_data.docuuid, gpt_resource_data.xml "
 getAllRecordsSQL += "FROM gpt_resource_data INNER JOIN gpt_resource ON gpt_resource_data.docuuid = gpt_resource.docuuid "
@@ -25,7 +25,7 @@ class record:
         self.docuuid = docuuid
         self.xml = xml    
         
-def make_query(callback, start_record=0):
+def make_query(callback, start_record=startRecNo):
     if start_record >= total_records:
         # All queries have been made
         return
