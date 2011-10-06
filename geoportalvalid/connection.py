@@ -1,4 +1,4 @@
-import psycopg2, math
+import psycopg2, math, datetime
 from config import dbString as connection_string, progressFilePath, startRecNo
 
 getAllRecordsSQL =  "SELECT gpt_resource_data.id, gpt_resource_data.docuuid, gpt_resource_data.xml "
@@ -17,6 +17,11 @@ total_records = 35 #cur.fetchone()[0]
 cur.close()
 
 records_per_query = 10
+
+# Start the log
+f = open(progressFilePath, "a")
+f.write("### Validation Started at record " + str(startRecNo) + " on " + str(datetime.datetime.now()) + " ###\n")
+f.close()
 
 # A record class to make the results easier to deal with
 class record:
@@ -48,7 +53,7 @@ def make_query(callback, start_record=startRecNo):
         callback(records)
         
         f = open(progressFilePath, "a")
-        f.write(str(start_record + records_per_query) + " of " + str(total_records) + " complete.\n")
+        f.write("Record number " + str(limit + offset) + " of " + str(total_records) + " complete.\n")
         f.close()
     
     
