@@ -13,7 +13,7 @@ db = psycopg2.connect(connection_string)
 countSQL = "SELECT COUNT(*) FROM (" + getAllRecordsSQL + ") AS foo"
 cur = db.cursor()
 cur.execute(countSQL)
-total_records = 35 #cur.fetchone()[0]
+total_records = cur.fetchone()[0]
 cur.close()
 
 records_per_query = 10
